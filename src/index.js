@@ -147,7 +147,9 @@ var decrypt = function decrypt(payload, privateKey, passphrase) {
             throw new Error("Unsupported \"zip\" detected in JOSE. currently only \"" + ZIP.GZIP + "\" supported");
         }
         var cek = AsymmetricDecryptWithPrivateKey(lru46esab(cekStr), privateKey, passphrase);
+        // NOTE: what is the algorithm i should use?
         var decipher = crypto_1.createDecipheriv(algorithm, cek, lru46esab(ivStr));
+        // var decipher = crypto_1.createDecipheriv(jose.enc, cek, lru46esab(ivStr));
         /**
          * When using an authenticated encryption mode ( like GCM ),
          * the decipher.setAuthTag() method is used to pass in the received authentication tag. If no tag is
@@ -160,6 +162,8 @@ var decrypt = function decrypt(payload, privateKey, passphrase) {
          */
         decipher.setAuthTag(lru46esab(tagStr));
         decipher.setAAD(Buffer.from(toSafeString(jose), 'utf8'));
+        // NOTE: mark2 error happens here, something about setAAD or authTRag is not working well
+        // Error: Unsupported state or unable to authenticate data
         var text = Buffer.concat([decipher.update(lru46esab(cipherTextStr)), decipher.final()]);
         if (jose.zip && jose.zip === ZIP.GZIP) {
             return zlib_1.gunzipSync(text, { level: zlib_1.constants.Z_BEST_COMPRESSION }).toString('utf8');
@@ -210,8 +214,8 @@ var encrypt = function encrypt(value, publicKey, options) {
      * The bit block size of the encryption algorithm dictates the
      * Byte size of the IV. eg: A128GCM is 128 Bits = 16 Bytes and 256 Bits would be 32
      */
-    var iv = crypto_1.randomBytes(32);
-    // var iv = crypto_1.randomBytes(8);
+    // var iv = crypto_1.randomBytes(32);
+    var iv = crypto_1.randomBytes(16);
     /**
      * aes-256-cgm - Advanced Encryption Standard (AES) in Galois/Counter Mode (GCM)
      * AES-GCM is a more secure cipher than AES-CBC, because AES-CBC, operates by XOR'ing

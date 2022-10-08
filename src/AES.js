@@ -4,17 +4,20 @@ const crypto = require("crypto");
 const algorithm = "aes-256-cbc"; 
 
 // generate 16 bytes of random data
-const initVector = crypto.randomBytes(16);
+// const initVector = crypto.randomBytes(16);
+const initVector = Buffer.from(crypto.randomBytes(16), 'utf8');
+console.log("init vector " + initVector);
 
 // protected data
 const message = "This is a secret message";
 
 // secret key generate 32 bytes of random data
-const Securitykey = crypto.randomBytes(32);
-
+// const Securitykey = crypto.randomBytes(32);
+const Securitykey = Buffer.from(crypto.randomBytes(32), 'utf8');
+console.log("security key " + Securitykey);
 // const keyString = Securitykey.;
 
-console.log(`initial vector is ${initVector} and securitykey is ${keyString}`);
+// console.log(`initial vector is ${initVector} and securitykey is ${keyString}`);
 
 // the cipher function
 const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
